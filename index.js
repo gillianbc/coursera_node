@@ -12,6 +12,8 @@ function solveRectangle(length,width){
         }
     });
 
+    console.log("After the call to rect");
+
 };
 
 solveRectangle(2,4);
