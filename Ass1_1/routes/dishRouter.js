@@ -2,6 +2,8 @@ const express = require('express');
 const bodyParser = require('body-parser');
 
 const dishRouter = express.Router();
+dishRouter.use(bodyParser.json());
+
 dishRouter.all((req,res,next) => {
     res.statusCode = 200;
     res.setHeader('Content-Type', 'text/plain');
