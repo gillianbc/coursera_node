@@ -3,53 +3,20 @@ const http = require('http');
 const morgan = require('morgan');
 const bodyParser = require('body-parser');
 
+const dishRouter = require('./routes/dishRouter');
+
+
 const hostname = 'localhost';
 const port = 3000;
 
 const app = express();
 app.use(morgan('dev'));
 app.use(bodyParser.json());
+app.use('/dishes', dishRouter);
 
-//when any requests come in for /dishes, do this then pass along the result and 
-//exec the next thing for any /dishes
-app.all('/dishes', (req, res, next) => {
-    res.statusCode = 200;
-    res.setHeader('Content-Type', 'text-plain');
-    next();
-});
-
-//===========================================
-
-//when any get requests come in for /dishes
-app.get('/dishes', (req, res, next) => {
-    //TO DO - code to get dishes
-    res.end('Here are your dishes');
-});
-
-//when any post requests come in for /dishes
-app.post('/dishes', (req, res, next) => {
-    //TO DO - code to do insert
-    res.end('I have added ' + req.body.name + ' ' + req.body.description);
-});
-
-//when any put requests come in for /dishes
-app.put('/dishes', (req, res, next) => {
-    res.statusCode = 403; 
-    res.end('PUT not supported on /dishes');
-});
-
-//when any delete requests come in for /dishes
-app.delete('/dishes', (req, res, next) => {
-    //TO DO - code to delete all dishes
-    res.end('All dishes deleted (dangerous)');
-});
 
 //============
-//when any get requests come in for /dishes/:dishId
-app.get('/dishes/:dishId', (req, res, next) => {
-    //TO DO - code to get dish
-    res.end('Here is your dish for id ' + req.params.dishId);
-});
+
 
 //when any post requests come in for /dishes/:dishId
 app.post('/dishes/:dishId', (req, res, next) => {
