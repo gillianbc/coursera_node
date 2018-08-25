@@ -3,6 +3,8 @@ const http = require('http');
 const morgan = require('morgan');
 
 const dishRouter = require('./routes/dishRouter');
+const promoRouter = require('./routes/promoRouter');
+const leaderRouter = require('./routes/leaderRouter');
 
 const hostname = 'localhost';
 const port = 3000;
@@ -11,9 +13,8 @@ const app = express();
 app.use(morgan('dev'));
 
 app.use('/dishes', dishRouter);
-
-
-
+app.use('/promos', promoRouter);
+app.use('/leaders', leaderRouter);
 
 //Tell express where to get static files from
 app.use(express.static(__dirname + '/public'));
