@@ -13,7 +13,7 @@ const app = express();
 app.use(morgan('dev'));
 
 app.use('/dishes', dishRouter);
-app.use('/promos', promoRouter);
+app.use('/promotions', promoRouter);
 app.use('/leaders', leaderRouter);
 
 //Tell express where to get static files from
