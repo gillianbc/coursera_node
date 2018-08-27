@@ -1,37 +1,20 @@
 const assert = require('assert');
 
 exports.insertDocument = (db, document, collection, callback) => {
-    const coll = db.collection(collection);
-    coll.insert(document, (err, result) => {
-        assert.equal(err, null);
-        console.log("Inserted " + result.result.n +
-            " documents into the collection " + collection);
-        callback(result);
-    });
+    //return the result of the insert
+    //When passed a single document, insert() returns a WriteResult object
+    return db.collection(collection).insert(document);
 };
 
 exports.findDocuments = (db, collection, callback) => {
-    const coll = db.collection(collection);
-    coll.find({}).toArray((err, docs) => {
-        assert.equal(err, null);
-        callback(docs);        
-    });
+    //find() returns a cursor to the documents that match the query criteria.
+    return db.collection(collection).find({}).toArray();
 };
 
 exports.removeDocument = (db, document, collection, callback) => {
-    const coll = db.collection(collection);
-    coll.deleteOne(document, (err, result) => {
-        assert.equal(err, null);
-        console.log("Removed the document ", document);
-        callback(result);        
-    });
+    return db.collection(collection).deleteOne(document);
 };
 
 exports.updateDocument = (db, document, update, collection, callback) => {
-    const coll = db.collection(collection);
-    coll.updateOne(document, { $set: update }, null, (err, result) => {
-        assert.equal(err, null);
-        console.log("Updated the document with ", update);
-        callback(result);        
-    });
+    return db.collection(collection).updateOne(document, { $set: update }, null);
 };
