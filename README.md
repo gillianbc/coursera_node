@@ -9,3 +9,4 @@ https://www.coursera.org/learn/server-side-nodejs/home/welcome
 
 Useful further reading with worked example of callback hell, async, promises, generators:
 https://strongloop.com/strongblog/node-js-callback-hell-promises-generators/
+https://medium.com/@js_tut/the-great-escape-from-callback-hell-3006fa2c82e
