@@ -7,11 +7,12 @@ I'm not much interested in the front end (at the moment) so I haven't done the f
 
 https://www.coursera.org/learn/server-side-nodejs/home/welcome
 
-# H1 Further Reading
+# Further Reading
+## Callbacks / Promises
 Useful further reading with worked example of callback hell, async, promises, generators:
 https://strongloop.com/strongblog/node-js-callback-hell-promises-generators/
 https://medium.com/@js_tut/the-great-escape-from-callback-hell-3006fa2c82e
 
-# H1 Mongoose
+## Mongoose
 Why do we need to use exec()?  https://stackoverflow.com/questions/31549857/mongoose-what-does-the-exec-function-do
 
