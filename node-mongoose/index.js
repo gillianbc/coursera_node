@@ -1,38 +1,42 @@
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
-const Dishes = require('./models/dishes');
+const url = "mongodb://localhost:27017/conFusion";
 
-const url = 'mongodb://localhost:27017/conFusion';
-const connect = mongoose.connect(url);
+const Dishes = require("./models/dishes");
 
-connect.then((db) => {
+mongoose
+  .connect(
+    url,
+    { useNewUrlParser: true }
+  )
+  .then(() => {
+    const db = mongoose.connection;
 
-    console.log('Connected correctly to server');
+    Dishes.create({
+      name: "Uthapizza",
+      description: "Test"
+    })
+    .then(dish => {
+      console.log(dish);
 
-    var newDish = Dishes({
-        name: 'Uthappizza',
-        description: 'test'
+      return Dishes.findByIdAndUpdate(
+        dish._id,
+        {
+          $set: {
+            description: "Updated Test"
+          }
+        },
+        { new: true }
+      );
+    })
+    .then(dish => {
+      console.log(dish);
+      return db.collection("dishes").drop();
+    })
+    .then(() => {
+      return db.close();
     });
-
-    newDish.save()
-        .then((dish) => {
-            console.log(dish);
-
-            return Dishes.find({});
-        })
-        .then((dishes) => {
-            console.log(dishes);
-
-            return Dishes.remove({});
-        })
-        .then(() => {
-            return mongoose.connection.close();
-        })
-        .catch((err) => {
-            console.log(err);
-        });
-
-})
-.catch((err) => {
-    console.log('Problem connecting to mongo db');
-});
+  })
+  .catch(e => {
+    console.log(e);
+  });
