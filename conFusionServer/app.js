@@ -1,17 +1,38 @@
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
+const createError = require('http-errors');
+const express = require('express');
+const path = require('path');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const mongoose = require('mongoose');
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
-var dishRouter = require('./routes/dishRouter');
-var promoRouter = require('./routes/promoRouter');
-var leaderRouter = require('./routes/leaderRouter');
+//local mongoose schema
+const Dishes = require('./models/dishes');
+//local modules for routes
+const indexRouter = require('./routes/index');
+const usersRouter = require('./routes/users');
+const dishRouter = require('./routes/dishRouter');
+const promoRouter = require('./routes/promoRouter');
+const leaderRouter = require('./routes/leaderRouter');
 
-var app = express();
+const url = 'mongodb://localhost:27017/conFusion';
+const connect = mongoose.connect(url);
 
+connect.then((db) => {
+  //port is set in the /bin/www file
+  console.log('DB connected just fine.  Use Postman now on localhost:3000');
+})
+.catch((err) => {
+  if (url != 'mongodb://localhost:27017/conFusion') {
+    console.log('Problem connecting to DB...url should be mongodb://localhost:27017/conFusion');
+    console.log('Url is ' + url);
+    process.exit();
+  }
+  else {
+    console.log('Problem connecting to DB.  Check mongodb is running');
+    process.exit();
+  }
+});
+const app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
