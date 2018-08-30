@@ -38,5 +38,6 @@ mongoose
     });
   })
   .catch(e => {
+    console.log('Problem connecting');
     console.log(e);
   });
