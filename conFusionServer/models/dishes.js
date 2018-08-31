@@ -1,7 +1,9 @@
 const mongoose = require('mongoose');
 require('mongoose-currency').loadType(mongoose);
 const Currency = mongoose.Types.Currency;
-
+//I've put the comments in a different file - that wasn't in the tutorial
+//I like to have one schema per file
+const comments = require('./comments');
 const Schema = mongoose.Schema;
 
 const dishSchema = new Schema({
@@ -34,8 +36,8 @@ const dishSchema = new Schema({
     featured: {
         type: Boolean,
         default:false      
-    }
-    // comments:[commentSchema]
+    },
+    comments:[comments.schema]
 }, {
     timestamps: true
 });
