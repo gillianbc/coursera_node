@@ -7,6 +7,8 @@ const mongoose = require('mongoose');
 
 //local mongoose schema
 const Dishes = require('./models/dishes');
+const Promotions = require('./models/promotions');
+const Leaders = require('./models/leaders');
 //local modules for routes
 const indexRouter = require('./routes/index');
 const usersRouter = require('./routes/users');

@@ -1,0 +1,9 @@
+{
+    "name":"Lemon Pudding",
+    "description": "Zingy lemon dessert",
+    "image":"lemonpud.png",
+    "category":"desserts",
+    "label":"good",
+    "price":"3.50",
+    "featured":"true"
+}

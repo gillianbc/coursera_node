@@ -1,0 +1,309 @@
+{
+	"info": {
+		"_postman_id": "abb2fee9-a5f5-47e5-847b-ca907ed622d7",
+		"name": "Dishes",
+		"description": "Start with empty Dishes\nAdd some\nUpdate some\nDelete some\nDelete all\nCheck empty\n\n\nuseful examples can be found here:\nhttps://steelkiwi.com/blog/api-testing-useful-tools-postman-tutorial-and-hints/",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "delete all dishes",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "2c48e534-8cfe-4e3f-904f-ce5b765b3e38",
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:3000/dishes",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dishes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all dishes when none",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "422956bd-3772-45db-a9cd-f0cc877d7977",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body is correct\", function () {",
+							"    pm.response.to.have.body(\"[]\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:3000/dishes",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dishes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Post dish with 2 comments",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "d43b3759-56a2-4266-b33a-2401f2bd739a",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body has name element\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"name\");",
+							"});",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Check name value\"] = jsonData.name === \"Lemon pud\";",
+							"tests[\"Check comment count\"] = jsonData.comments.length === 2;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n      \"name\": \"Lemon pud\",\r\n      \"image\": \"lemon.png\",\r\n      \"category\": \"puds\",\r\n      \"label\": \"hot\",\r\n      \"price\": \"2.99\",\r\n      \"featured\": \"true\",\r\n      \"description\": \"Zingy lemon pud\",\r\n      \"comments\": [\r\n        {\r\n          \"rating\": 5,\r\n          \"comment\": \"Tasty, tasty\",\r\n          \"author\": \"John Lemon\",\r\n          \"date\": \"2012-10-16T17:57:28.556094Z\"\r\n        },\r\n        {\r\n          \"rating\": 4,\r\n          \"comment\": \"More please\",\r\n          \"author\": \"Paul Orange\",\r\n          \"date\": \"2014-09-05T17:57:28.556094Z\"\r\n        }\r\n      ]\r\n    }"
+				},
+				"url": {
+					"raw": "localhost:3000/dishes",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dishes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get all dishes - expect one",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "c532a8ea-7b4f-4278-941e-92217fde7c80",
+						"type": "text/javascript",
+						"exec": [
+							"",
+							"tests[\"Check dishes count\"] = JSON.parse(responseBody).length === 1;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {},
+				"url": {
+					"raw": "localhost:3000/dishes",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dishes"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Put dish - change imge and name (ID)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "fc327093-7644-470a-85cb-2422e8c7d78e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body has name element\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"name\");",
+							"});",
+							"",
+							"",
+							"var jsonData = JSON.parse(responseBody);",
+							"tests[\"Check name value\"] = jsonData.name === \"Lemon pudding\";",
+							"tests[\"Check name image\"] = jsonData.image === \"lemonpud.png\";",
+							"tests[\"Check comment count\"] = jsonData.comments.length === 2;",
+							""
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n      \"name\": \"Lemon pudding\",\r\n      \"image\": \"lemonpud.png\"\r\n}"
+				},
+				"url": {
+					"raw": "localhost:3000/dishes/5b8ae6c88be6c12a281490f1",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dishes",
+						"5b8ae6c88be6c12a281490f1"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Put dish dishes - status 403 Forbidden",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "75a63070-e09a-433f-a20a-27de2a805c4e",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 403 Forbidden\", function () {",
+							"    pm.response.to.have.status(403)",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "PUT",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n      \"name\": \"Lemon pudding\",\r\n      \"image\": \"lemonpud.png\"\r\n}"
+				},
+				"url": {
+					"raw": "localhost:3000/dishes/",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dishes",
+						""
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "delete 1 dish (ID)",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"id": "827a1527-3445-43be-81b9-a2037581ddc7",
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Body matches string\", function () {",
+							"    pm.expect(pm.response.text()).to.include(\"\");",
+							"});"
+						]
+					}
+				}
+			],
+			"request": {
+				"method": "DELETE",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/javascript"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "localhost:3000/dishes/5b8aebb78be6c12a28149100",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"dishes",
+						"5b8aebb78be6c12a28149100"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"id": "90cf4f88-01cc-4cb5-96d6-5801ab208d4e",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"id": "b7d33626-e3cd-429d-a00a-0320ef15ce58",
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

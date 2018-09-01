@@ -1,3 +1,4 @@
 *.pdf
 mongodb/data
 node_modules
+schemas
