@@ -38,11 +38,35 @@ const app = express();
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
-
+//Load middleware
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
+//Authentication
+function auth (req, res, next) {
+  console.log(req.headers);
+  const authHeader = req.headers.authorization;
+  if (!authHeader) {
+      let err = new Error('You are not authenticated!');
+      res.setHeader('WWW-Authenticate', 'Basic');
+      err.status = 401;
+      next(err);
+      return;
+  }
+  const authArray = new Buffer(authHeader.split(' ')[1], 'base64').toString().split(':');
+  const user = authArray[0];
+  const passwd = authArray[1];
+  if (user == 'admin' && passwd == 'password') {
+      next(); // authorized
+  } else {
+      let err = new Error('You are not authenticated!');
+      res.setHeader('WWW-Authenticate', 'Basic');      
+      err.status = 401;
+      next(err);
+  }
+}
+app.use(auth);
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.use('/', indexRouter);
@@ -54,6 +78,7 @@ app.use('/leaders',leaderRouter);
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
   // next(createError(404));
+  console.log('here');
   next();
 });
 
