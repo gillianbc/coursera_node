@@ -1,7 +1,8 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const cookieParser = require('cookie-parser');
+var session = require('express-session');
+var FileStore = require('session-file-store')(session);
 const logger = require('morgan');
 const mongoose = require('mongoose');
 
@@ -44,8 +45,15 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+//This adds session to the request i.e. req.session
+app.use(session({
+  name: 'session-id',
+  secret: '12345-67890-09876-54321',
+  saveUninitialized: false,
+  resave: false,
+  store: new FileStore()
+}));
 
-app.use(cookieParser('12345-67890-09876-54321')); //secret key
 app.use(auth);
 app.use(express.static(path.join(__dirname, 'public')));
 
