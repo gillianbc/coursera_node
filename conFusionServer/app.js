@@ -13,8 +13,8 @@ const Leaders = require('./models/leaders');
 // authentication
 const auth = require('./authentication');
 //local modules for routes
-const indexRouter = require('./routes/index');
-const usersRouter = require('./routes/users');
+const indexRouter = require('./routes/indexRouter');
+const userRouter = require('./routes/userRouter');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
@@ -53,12 +53,14 @@ app.use(session({
   resave: false,
   store: new FileStore()
 }));
+//These need to occur before auth so that a non-logged in user can register and login
+app.use('/', indexRouter);
+app.use('/users', userRouter);
 
 app.use(auth);
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
