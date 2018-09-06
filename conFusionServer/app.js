@@ -1,10 +1,12 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-var session = require('express-session');
-var FileStore = require('session-file-store')(session);
+const session = require('express-session');
+const FileStore = require('session-file-store')(session);
 const logger = require('morgan');
 const mongoose = require('mongoose');
+const passport = require('passport');
+const ppauthenticate = require('./passportauth');
 
 //local mongoose schema
 const Dishes = require('./models/dishes');
@@ -53,6 +55,10 @@ app.use(session({
   resave: false,
   store: new FileStore()
 }));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
 //These need to occur before auth so that a non-logged in user can register and login
 app.use('/', indexRouter);
 app.use('/users', userRouter);
