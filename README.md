@@ -19,3 +19,6 @@ Why do we need to use exec()?  https://stackoverflow.com/questions/31549857/mong
 ## Express
 https://expressjs.com/en/4x/api.html#express
 
+## Node
+exports - http://www.tutorialsteacher.com/nodejs/nodejs-module-exports
+
