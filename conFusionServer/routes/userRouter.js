@@ -74,7 +74,6 @@ userRouter.get('/logout', (req, res) => {
 // We do define the signature for the last callback as that's defined here locally
 // That puzzled me for ages;  it's simple really
 userRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
-  // authenticate.verifyAdmin(req, res, next);
   Users.find({})
   .then((users) => {
       res.statusCode = 200;

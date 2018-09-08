@@ -14,7 +14,7 @@ exports.getToken = function (user) {
     return jwt.sign(user, config.secretKey,
         { expiresIn: 7200 });
 };
-//I have no clue how this managed to receive req res next, but it works
+
 exports.verifyAdmin = function (req, res, next) {
     if (req.user.admin)
         next();
