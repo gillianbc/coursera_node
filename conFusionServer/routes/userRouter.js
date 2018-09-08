@@ -66,6 +66,13 @@ userRouter.get('/logout', (req, res) => {
   }
 });
 /* GET users listing. */
+// Note the syntax here.  router.METHOD(path, [callback, ...] callback)
+// So we can give the name of a callback or define a local callback
+// verifyAdmin is a function defined in authenticate.js - we're not calling it, 
+// we are naming it as one of the callbacks (middleware) to use, 
+// so we don't say this:  authenticate.verifyAdmin(req, res, next)
+// We do define the signature for the last callback as that's defined here locally
+// That puzzled me for ages;  it's simple really
 userRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
   // authenticate.verifyAdmin(req, res, next);
   Users.find({})
