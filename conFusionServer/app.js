@@ -1,27 +1,24 @@
 const createError = require('http-errors');
 const express = require('express');
 const path = require('path');
-const session = require('express-session');
-const FileStore = require('session-file-store')(session);
 const logger = require('morgan');
 const mongoose = require('mongoose');
 const passport = require('passport');
-const ppauthenticate = require('./passportauth');
+const ppauthenticate = require('./authenticate');
 
 //local mongoose schema
 const Dishes = require('./models/dishes');
 const Promotions = require('./models/promotions');
 const Leaders = require('./models/leaders');
-// authentication
-const auth = require('./authentication');
+
 //local modules for routes
 const indexRouter = require('./routes/indexRouter');
 const userRouter = require('./routes/userRouter');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
-
-const url = 'mongodb://localhost:27017/conFusion';
+const config = require('./config');
+const url = config.mongoUrl;
 const connect = mongoose.connect(url);
 
 connect.then((db) => {
@@ -47,14 +44,6 @@ app.set('view engine', 'jade');
 app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-//This adds session to the request i.e. req.session
-app.use(session({
-  name: 'session-id',
-  secret: '12345-67890-09876-54321',
-  saveUninitialized: false,
-  resave: false,
-  store: new FileStore()
-}));
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -63,9 +52,7 @@ app.use(passport.session());
 app.use('/', indexRouter);
 app.use('/users', userRouter);
 
-app.use(auth);
 app.use(express.static(path.join(__dirname, 'public')));
-
 
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
