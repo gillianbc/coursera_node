@@ -1,7 +1,7 @@
 var express = require('express');
 var userRouter = express.Router();
 const bodyParser = require('body-parser');
-var User = require('../models/users');
+var Users = require('../models/users');
 var passport = require('passport');
 var authenticate = require('../authenticate');
 userRouter.use(bodyParser.json());
@@ -66,8 +66,16 @@ userRouter.get('/logout', (req, res) => {
   }
 });
 /* GET users listing. */
-userRouter.get('/', function(req, res, next) {
-  res.send('respond with a resource');
+userRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
+  // authenticate.verifyAdmin(req, res, next);
+  Users.find({})
+  .then((users) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
+      res.json(users);
+  }, (err) => next(err))
+  .catch((err) => next(err));
 });
+
 //Don't we need a next() here?
 module.exports = userRouter;
