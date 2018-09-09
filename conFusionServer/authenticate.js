@@ -5,8 +5,6 @@ var JwtStrategy = require('passport-jwt').Strategy;
 var ExtractJwt = require('passport-jwt').ExtractJwt;
 var jwt = require('jsonwebtoken'); // used to create, sign, and verify tokens
 var config = require('./config.js');
-//Note the syntax here.  module.exports is used for exporting functions
-//Here we are exporting an object called local 
 exports.local = passport.use(new LocalStrategy(User.authenticate()));
 //Define what user information should be stored in the session
 
