@@ -98,7 +98,7 @@ dishRouter.route('/:dishId/comments')
     }, (err) => next(err))
     .catch((err) => next(err));
 })
-.post(authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next) => {
+.post(authenticate.verifyUser,(req, res, next) => {
     Dishes.findById(req.params.dishId)
     .then((dish) => {
         if (dish != null) {
@@ -175,22 +175,32 @@ dishRouter.route('/:dishId/comments/:commentId')
     res.end('POST operation not supported on /dishes/'+ req.params.dishId
         + '/comments/' + req.params.commentId);
 })
-.put(authenticate.verifyUser, authenticate.verifyAdmin,(req, res, next) => {
+.put(authenticate.verifyUser, (req, res, next) => {
     Dishes.findById(req.params.dishId)
+    .populate('comments.author')
     .then((dish) => {
+        console.log('Comment author ' + dish.comments.id(req.params.commentId).author.username);
+        console.log('Logged in user ' + req.user.username);
         if (dish != null && dish.comments.id(req.params.commentId) != null) {
-            if (req.body.rating) {
-                dish.comments.id(req.params.commentId).rating = req.body.rating;
+            if (dish.comments.id(req.params.commentId).author.username == req.user.username) {
+                if (req.body.rating) {
+                    dish.comments.id(req.params.commentId).rating = req.body.rating;
+                }
+                if (req.body.comment) {
+                    dish.comments.id(req.params.commentId).comment = req.body.comment;                
+                }
+                dish.save()
+                .then((dish) => {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(dish);                
+                }, (err) => next(err));
+            } else {
+                let err = new Error("You are not authorized to update this comment, " + req.user.username);
+                err.status = 403;
+                next(err);
             }
-            if (req.body.comment) {
-                dish.comments.id(req.params.commentId).comment = req.body.comment;                
-            }
-            dish.save()
-            .then((dish) => {
-                res.statusCode = 200;
-                res.setHeader('Content-Type', 'application/json');
-                res.json(dish);                
-            }, (err) => next(err));
+            
         }
         else if (dish == null) {
             err = new Error('Dish ' + req.params.dishId + ' not found');
