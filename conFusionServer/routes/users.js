@@ -1,84 +1,87 @@
 var express = require('express');
-var passport = require('passport');
-var Users = require('../models/user');
-var Verify = require('./verify');
-
 var userRouter = express.Router();
+const bodyParser = require('body-parser');
+var Users = require('../models/users');
+var passport = require('passport');
+var authenticate = require('../authenticate');
+userRouter.use(bodyParser.json());
 
+//REGISTER NEW USER
+//POST localhost:3000/users/signup  {"username":"gillian","password":"password"}
+userRouter.post('/signup', (req, res, next) => {
+  console.log('Signup');
+  User.register(new User({username: req.body.username}), 
+    req.body.password, (err, user) => {
+    if(err) {
+      res.statusCode = 500;
+      res.setHeader('Content-Type', 'application/json');
+      res.json({err: err});
+    }
+    else {
+      if (req.body.firstname)
+        user.firstname = req.body.firstname;
+      if (req.body.lastname)
+        user.lastname = req.body.lastname;
+        user.save((err,user) => {
+          if (err){
+            res.statusCode = 500;
+            res.setHeader('Content-Type', 'application/json');
+            res.json({err: err});
+            return;
+          }
+        });
+      //REALLY?  This syntax?
+      passport.authenticate('local')(req, res, () => {
+        var token = authenticate.getToken({_id: req.user._id});
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json({success: true, token: token, status: 'Registration Successful.  You are logged in ' + user.username});
+      });
+    }
+  });
+});
+
+//LOGIN
+// localhost:3000/users/login with username and password in body
+userRouter.post('/login', passport.authenticate('local'), (req, res) => {
+  var token = authenticate.getToken({_id: req.user._id});
+  res.statusCode = 200;
+  res.setHeader('Content-Type', 'application/json');
+  res.json({success: true, token: token, status: 'You are successfully logged in, ' + req.body.username});
+});
+
+//LOGOUT
+//localhost:3000/users/logout
+userRouter.get('/logout', (req, res) => {
+  if (req.session) {
+    console.log('Logout: ' + req.user.username);
+    req.session.destroy();
+    res.clearCookie('session-id');
+    res.redirect('/');
+  }
+  else {
+    var err = new Error('You are not logged in!');
+    err.status = 403;
+    next(err);
+  }
+});
 /* GET users listing. */
-userRouter.route('/')
-  .get(Verify.verifyOrdinaryUser, Verify.verifyAdmin, function(req, res, next) {
-    Users.find({}, function(err, users) {
-      if (err) throw err;
+// Note the syntax here.  router.METHOD(path, [callback, ...] callback)
+// So we can give the name of a callback or define a local callback
+// verifyAdmin is a function defined in authenticate.js - we're not calling it, 
+// we are naming it as one of the callbacks (middleware) to use, 
+// so we don't say this:  authenticate.verifyAdmin(req, res, next)
+// We do define the signature for the last callback as that's defined here locally
+// That puzzled me for ages;  it's simple really
+userRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
+  Users.find({})
+  .then((users) => {
+      res.statusCode = 200;
+      res.setHeader('Content-Type', 'application/json');
       res.json(users);
-    });
-  });
-
-userRouter.post('/register', function(req, res) {
-  Users.register(new Users({
-      username: req.body.username
-    }),
-    req.body.password,
-    function(err, user) {
-      if (err) {
-        return res.status(500).json({
-          err: err
-        });
-      }
-      if (req.body.admin) {
-        Users.findOneAndUpdate({
-          username: req.body.username
-        }, {
-          admin: true
-        }, {
-          new: true
-        }, function(err, user) {
-          if (err) throw err;
-          console.log(user.username, user.admin);
-          user.save();
-        });
-      }
-
-      passport.authenticate('local')(req, res, function() {
-        return res.status(200).json({
-          status: 'Registration Successful!'
-        });
-      });
-    });
+  }, (err) => next(err))
+  .catch((err) => next(err));
 });
 
-userRouter.post('/login', function(req, res, next) {
-  passport.authenticate('local', function(err, user, info) {
-    if (err) {
-      return next(err);
-    }
-    if (!user) {
-      return res.status(401).json({
-        err: info
-      });
-    }
-    req.logIn(user, function(err) {
-      if (err) {
-        return res.status(500).json({
-          err: 'Could not log in user'
-        });
-      }
-
-      var token = Verify.getToken(user);
-      res.status(200).json({
-        status: 'Login successful!',
-        success: true,
-        token: token
-      });
-    });
-  })(req, res, next);
-});
-
-userRouter.get('/logout', function(req, res) {
-  req.logout();
-  res.status(200).json({
-    status: 'Bye!'
-  });
-});
-
+//Don't we need a next() here?
 module.exports = userRouter;

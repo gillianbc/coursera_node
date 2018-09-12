@@ -5,7 +5,7 @@ const logger = require('morgan');
 const mongoose = require('mongoose');
 const passport = require('passport');
 const ppauthenticate = require('./authenticate');
-
+const debug = require('debug');
 //local mongoose schema
 const Dishes = require('./models/dishes');
 const Promotions = require('./models/promotions');
@@ -13,10 +13,11 @@ const Leaders = require('./models/leaders');
 
 //local modules for routes
 const indexRouter = require('./routes/indexRouter');
-const userRouter = require('./routes/userRouter');
+const userRouter = require('./routes/users');
 const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
+const uploadRouter = require('./routes/uploadRouter');
 const config = require('./config');
 const url = config.mongoUrl;
 const connect = mongoose.connect(url);
@@ -45,15 +46,18 @@ app.use(logger('dev'));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 // Secure traffic only
-app.all('*', (req, res, next) => {
-  if (req.secure) {
-    return next();
-  }
-  else {
-    console.log('Redirecting to secure server');
-    res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
-  }
-});
+// In postman, use localhost:3000 for http or use
+// https:/localhost:3443 directly
+// Switch off SSL certificate verification in settings.
+// app.all('*', (req, res, next) => {
+//   if (req.secure) {
+//     return next();
+//   }
+//   else {
+//     console.log('Redirecting to secure server');
+//     res.redirect(307, 'https://' + req.hostname + ':' + app.get('secPort') + req.url);
+//   }
+// });
 app.use(passport.initialize());
 app.use(passport.session());
 
@@ -66,13 +70,13 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
-
+app.use('/image/upload',uploadRouter);
 // catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  // next(createError(404));
-  console.log('here');
-  next();
-});
+// app.use(function(req, res, next) {
+//   // next(createError(404));
+//   // console.log('here');
+//   next();
+// });
 
 // error handler
 app.use(function(err, req, res, next) {
