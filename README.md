@@ -22,3 +22,6 @@ https://expressjs.com/en/4x/api.html#express
 ## Node
 exports - http://www.tutorialsteacher.com/nodejs/nodejs-module-exports
 
+## CORS - Cross Origin Resource Sharing
+Great diagram - https://developer.mozilla.org/en-US/docs/Web/HTTP/CORS, but I had to laugh at their comment "Who should read this article?  Everyone, really".  I think the guys at MDN need to get out more.
+
