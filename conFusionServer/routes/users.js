@@ -4,11 +4,15 @@ const bodyParser = require('body-parser');
 var Users = require('../models/users');
 var passport = require('passport');
 var authenticate = require('../authenticate');
+const cors = require('./cors'); 
 userRouter.use(bodyParser.json());
+
+userRouter.route('/')
+.options(cors.corsWithOptions, (req, res) => { res.sendStatus(200); });
 
 //REGISTER NEW USER
 //POST localhost:3000/users/signup  {"username":"gillian","password":"password"}
-userRouter.post('/signup', (req, res, next) => {
+userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
   console.log('Signup');
   User.register(new User({username: req.body.username}), 
     req.body.password, (err, user) => {
@@ -43,7 +47,7 @@ userRouter.post('/signup', (req, res, next) => {
 
 //LOGIN
 // localhost:3000/users/login with username and password in body
-userRouter.post('/login', passport.authenticate('local'), (req, res) => {
+userRouter.post('/login', cors.corsWithOptions, passport.authenticate('local'), (req, res) => {
   var token = authenticate.getToken({_id: req.user._id});
   res.statusCode = 200;
   res.setHeader('Content-Type', 'application/json');
@@ -52,7 +56,7 @@ userRouter.post('/login', passport.authenticate('local'), (req, res) => {
 
 //LOGOUT
 //localhost:3000/users/logout
-userRouter.get('/logout', (req, res) => {
+userRouter.get('/logout', cors.cors, (req, res) => {
   if (req.session) {
     console.log('Logout: ' + req.user.username);
     req.session.destroy();
@@ -73,7 +77,7 @@ userRouter.get('/logout', (req, res) => {
 // so we don't say this:  authenticate.verifyAdmin(req, res, next)
 // We do define the signature for the last callback as that's defined here locally
 // That puzzled me for ages;  it's simple really
-userRouter.get('/', authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
+userRouter.get('/', cors.cors, authenticate.verifyUser, authenticate.verifyAdmin, function(req, res, next) {
   Users.find({})
   .then((users) => {
       res.statusCode = 200;
