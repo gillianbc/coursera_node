@@ -10,6 +10,7 @@ const debug = require('debug');
 const Dishes = require('./models/dishes');
 const Promotions = require('./models/promotions');
 const Leaders = require('./models/leaders');
+const Favorites = require('./models/favorites');
 
 //local modules for routes
 const indexRouter = require('./routes/indexRouter');
@@ -18,6 +19,7 @@ const dishRouter = require('./routes/dishRouter');
 const promoRouter = require('./routes/promoRouter');
 const leaderRouter = require('./routes/leaderRouter');
 const uploadRouter = require('./routes/uploadRouter');
+const favoriteRouter = require('./routes/favoriteRouter');
 const config = require('./config');
 const url = config.mongoUrl;
 const connect = mongoose.connect(url);
@@ -71,6 +73,7 @@ app.use('/dishes',dishRouter);
 app.use('/promotions',promoRouter);
 app.use('/leaders',leaderRouter);
 app.use('/image/upload',uploadRouter);
+app.use('/favorites',favoriteRouter);
 // catch 404 and forward to error handler
 // app.use(function(req, res, next) {
 //   // next(createError(404));
