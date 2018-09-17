@@ -14,7 +14,7 @@ userRouter.route('/')
 //POST localhost:3000/users/signup  {"username":"gillian","password":"password"}
 userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
   console.log('Signup');
-  User.register(new User({username: req.body.username}), 
+  Users.register(new Users({username: req.body.username}), 
     req.body.password, (err, user) => {
     if(err) {
       res.statusCode = 500;

@@ -9,6 +9,20 @@ const cors = require('./cors');
 const favoriteRouter = express.Router();
 favoriteRouter.use(bodyParser.json());
 
+//Just for my benefit - not part of the assignment
+favoriteRouter.route('/all')
+.options(cors.corsWithOptions, authenticate.verifyUser, (req, res) => { res.sendStatus(200); })
+.get(cors.cors, (req,res,next) => {
+    Favorites.find({})
+    .then((faves) => {
+        console.log('Get favourites');
+        res.statusCode = 200;
+        res.setHeader('Content-Type', 'application/json');
+        res.json(faves);
+    }, (err) => next(err))
+    .catch((err) => next(err));
+});
+
 favoriteRouter.route('/')
 .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) => { res.sendStatus(200); })
 .get(cors.cors, (req,res,next) => {
@@ -64,17 +78,21 @@ favoriteRouter.route('/:dishId')
                     Favorites.create({user : req.user._id})
                     .then((newfaveList) => {
                         console.log('Favourites list Created OK');
+                        //HERE - THIS BIT IS NO GOOD
+                        //CREATING LIST AND ADDING A DISH NOT WORKING
                         faveList = newfaveList;
                     },(err) => next(err))
                     .catch((err) => next(err));
                 }
-                let found = false;
-                if (faveList.dishes.length > 0) {
-                    console.log('The favelist dishes are:' + faveList.dishes);
-                    found = faveList.dishes.includes(dish._id);
-                    console.log('Dish in fave list is ' + found);
+                let position = -1;
+                if (faveList.dishes && faveList.dishes.length > 0) {
+                    console.log('The favelist dishes are:' + faveList.dishes + ' looking for ' + dish._id);
+                    console.log('Index ' + faveList.dishes.indexOf(dish._id));
+                    // position = faveList.dishes.includes(dish._id);
+                    position = faveList.dishes.indexOf(dish._id);
+                    console.log('Dish in fave list is ' + position);
                 }
-                if (found == false) {
+                if (position < 0) {
                     console.log('Adding dish');
                     faveList.dishes.push({_id : dish._id});
                     faveList.save()
@@ -83,6 +101,11 @@ favoriteRouter.route('/:dishId')
                         res.setHeader('Content-Type', 'application/json');
                         res.json(fave);                
                     }, (err) => next(err));
+                }
+                else {
+                    res.statusCode = 200;
+                    res.setHeader('Content-Type', 'application/json');
+                    res.json(faveList);  
                 }
             })
             .catch((err) => next(err));
