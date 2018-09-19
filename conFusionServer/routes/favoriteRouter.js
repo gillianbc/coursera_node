@@ -15,7 +15,7 @@ favoriteRouter.route('/all')
 .get(cors.cors, (req,res,next) => {
     Favorites.find({})
     .then((faves) => {
-        console.log('Get favourites');
+        console.log('Get all favourites');
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
         res.json(faves);
@@ -27,6 +27,8 @@ favoriteRouter.route('/')
 .options(cors.corsWithOptions, authenticate.verifyUser, (req, res) => { res.sendStatus(200); })
 .get(cors.cors, (req,res,next) => {
     Favorites.find({})
+    .populate('user')
+    .populate('dishes')
     .then((faves) => {
         console.log('Get favourites');
         res.statusCode = 200;
@@ -74,7 +76,6 @@ favoriteRouter.route('/:dishId')
             //Check if the user has a favourites list already
             Favorites.findOne({"user" : req.user._id})
             .then((faveList) => {
-                console.log('Here' + faveList);
                 if (faveList == null) {
                     //Create favourite list
                     //Note:  create is Mongoose, not Mongo
