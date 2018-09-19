@@ -65,6 +65,8 @@ favoriteRouter.route('/:dishId')
     res.end('POST operation not supported on //'+ req.params.dishId);
 })
 .post(cors.corsWithOptions, authenticate.verifyUser,  (req, res, next) => {
+    // =====
+
     //Check if the dish exists
     Dishes.findById(req.params.dishId)
     .then((dish) => {
@@ -72,41 +74,50 @@ favoriteRouter.route('/:dishId')
             //Check if the user has a favourites list already
             Favorites.findOne({"user" : req.user._id})
             .then((faveList) => {
+                console.log('Here' + faveList);
                 if (faveList == null) {
                     //Create favourite list
                     //Note:  create is Mongoose, not Mongo
                     Favorites.create({user : req.user._id})
                     .then((newfaveList) => {
                         console.log('Favourites list Created OK');
-                        //HERE - THIS BIT IS NO GOOD
-                        //CREATING LIST AND ADDING A DISH NOT WORKING
-                        faveList = newfaveList;
+                        if (!isDishInList(newfaveList,dish)) {
+                            console.log('Adding dish');
+                            newfaveList.dishes.push({_id : dish._id});
+                            newfaveList.save()
+                            .then((fave) => {
+                                res.statusCode = 200;
+                                res.setHeader('Content-Type', 'application/json');
+                                res.json(fave);                
+                            }, (err) => next(err));
+                        }
+                        else {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(newfaveList);  
+                        } 
                     },(err) => next(err))
                     .catch((err) => next(err));
                 }
-                let position = -1;
-                if (faveList.dishes && faveList.dishes.length > 0) {
-                    console.log('The favelist dishes are:' + faveList.dishes + ' looking for ' + dish._id);
-                    console.log('Index ' + faveList.dishes.indexOf(dish._id));
-                    // position = faveList.dishes.includes(dish._id);
-                    position = faveList.dishes.indexOf(dish._id);
-                    console.log('Dish in fave list is ' + position);
-                }
-                if (position < 0) {
-                    console.log('Adding dish');
-                    faveList.dishes.push({_id : dish._id});
-                    faveList.save()
-                    .then((fave) => {
+                else {
+                    if (!isDishInList(faveList,dish)) {
+                        console.log('Adding dish');
+                        faveList.dishes.push({_id : dish._id});
+                        faveList.save()
+                        .then((fave) => {
+                            res.statusCode = 200;
+                            res.setHeader('Content-Type', 'application/json');
+                            res.json(fave);                
+                        }, (err) => next(err));
+                    }
+                    else {
                         res.statusCode = 200;
                         res.setHeader('Content-Type', 'application/json');
-                        res.json(fave);                
-                    }, (err) => next(err));
+                        res.json(faveList);  
+                    } 
                 }
-                else {
-                    res.statusCode = 200;
-                    res.setHeader('Content-Type', 'application/json');
-                    res.json(faveList);  
-                }
+                
+                
             })
             .catch((err) => next(err));
         } else {
@@ -132,6 +143,20 @@ favoriteRouter.route('/:dishId')
     }, (err) => next(err))
     .catch((err) => next(err));
 });
+
+function isDishInList(favourites, dish){
+    let position = -1;
+    if (favourites.dishes && favourites.dishes.length > 0) {
+        console.log('The favelist dishes are:' + favourites.dishes + ' looking for ' + dish._id);
+        console.log('Index ' + favourites.dishes.indexOf(dish._id));
+        position = favourites.dishes.indexOf(dish._id);
+        console.log('Dish in fave list is ' + position);
+        if (position < 0)
+            return false;
+        else
+            return true; 
+    }
+};
 
 module.exports = favoriteRouter;
 
