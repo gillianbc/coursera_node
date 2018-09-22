@@ -188,9 +188,9 @@ dishRouter.route('/:dishId/comments/:commentId')
     Dishes.findById(req.params.dishId)
     .populate('comments.author')
     .then((dish) => {
-        console.log('Comment author ' + dish.comments.id(req.params.commentId).author.username);
-        console.log('Logged in user ' + req.user.username);
         if (dish != null && dish.comments.id(req.params.commentId) != null) {
+            console.log('Comment author ' + dish.comments.id(req.params.commentId).author.username);
+            console.log('Logged in user ' + req.user.username);
             if (dish.comments.id(req.params.commentId).author.username == req.user.username) {
                 if (req.body.rating) {
                     dish.comments.id(req.params.commentId).rating = req.body.rating;

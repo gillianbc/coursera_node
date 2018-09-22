@@ -3,6 +3,9 @@ const dishes = require('./dishes');
 const Schema = mongoose.Schema;
 
 const favoriteSchema = new Schema({
+    username: {
+        type: String
+    },
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'User' 
