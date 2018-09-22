@@ -42,6 +42,7 @@ favoriteRouter.route('/')
     .catch((err) => next(err));
 })
 .post(cors.corsWithOptions,authenticate.verifyUser, (req, res, next) => {
+    console.log('post user is ' + req.user._id);
     addBodyDishesToFaveList(req,res,next)
 })
 .put(cors.corsWithOptions, (req, res, next) => {
@@ -65,7 +66,7 @@ favoriteRouter.route('/:dishId')
     res.end('GET operation not supported on //'+ req.params.dishId);
 })
 .post(cors.corsWithOptions, authenticate.verifyUser,  (req, res, next) => {
-    addDishToFaveList(req, res, next);
+    addDishToFaveList(req, res, next,req.params.dishId,true);
 })
 .put((req, res, next) => {
     res.statusCode = 403;
@@ -118,29 +119,50 @@ function notFound(errorText){
     throw err;
     // return next(err);
 }
-function addDishToFaveList(req, res, next){
+function addBodyDishesToFaveList(req, res, next){
+    var dishId;
+    var favelist;
+    console.log('addBodyDishesToFaveList user is ' + req.user._id);
+    for (var i in req.body) { 
+        if (req.body[i].hasOwnProperty('_id')) { 
+            dishId = req.body[i]._id;
+            console.log('The item id is ' + req.body[i]._id); 
+            addDishToFaveList(req, res, next, dishId, false)
+            .then
+        } 
+    }
+    Favorites.findOne({"user" : req.user._id})
+    .then((favelist) => {
+        successResponse(favelist,200,res),(err) => next(err)
+    })
+    .catch((err) => next(err));
+    
+}
+function addDishToFaveList(req, res, next, dishId, dishes){
+    console.log('Dish id is ' + dishId);
     var dish;
     //Get the dish from Mongo
-    Dishes.findById(req.params.dishId)
+    Dishes.findById(dishId)
     .then((fetchedDish) => {
         if (!fetchedDish) 
-            notFound(req,next,'Dish ' + req.params.dishId + ' not found');
+            notFound(req,next,'Dish ' + dishId + ' not found');
         dish = fetchedDish;  //hang on to the dish, we'll need it later
         //return the result of fetching the user's favourites list
         return Favorites.findOne({"user" : req.user._id});
     })
     .then((favelist) => {
-        if (!favelist)
+        if (!favelist){
             //return the result of creating a favelist
+            console.log('Creating favelist');
             return Favorites.create({user : req.user._id})
+        }
         else
-            // return the favelist
             return favelist;
     })
     .then((favelist) => {
-        if (!favelist) notFound("No fave list (unexpected)");
         if (!isDishInList(favelist,dish)) {
             favelist.dishes.push({_id : dish._id});
+            console.log('Adding dish ' + dish._id);
             //return the result of saving the favelist
             return favelist.save();
         }
@@ -151,7 +173,9 @@ function addDishToFaveList(req, res, next){
             return favelist;
         }
     })
-    .then((favelist) => successResponse(favelist,200,res),(err) => next(err))
+    .then((favelist) => {
+        successResponse(favelist,200,res),(err) => next(err);
+    })
     .catch((err) => next(err));
 }
 module.exports = favoriteRouter;
