@@ -40,61 +40,7 @@ favoriteRouter.route('/')
     .catch((err) => next(err));
 })
 .post(cors.corsWithOptions,authenticate.verifyUser, (req, res, next) => {
-    //Check if the user has a favourites list already
-    Favorites.findOne({"user" : req.user._id})
-    .then((faveList) => {
-        if (faveList == null) {
-            //Create favourite list
-            //Note:  create is Mongoose, not Mongo
-            Favorites.create({user : req.user._id})
-            .then((newfaveList) => {
-                console.log('Favourites list Created OK');
-                // To do - loop through dishes in req.body
-                for (var _id in req.body) { 
-                    if (req.body.hasOwnProperty(_id)) { 
-                        console.log(_id + " -> " + p[_id]); 
-                    } 
-                }
-                if (!isDishInList(newfaveList,dish)) {
-                    console.log('Adding dish');
-                    newfaveList.dishes.push({_id : dish._id});
-                    newfaveList.save()
-                    .then((fave) => {
-                        success(fave,200,res);               
-                    }, (err) => next(err));
-                }
-                else {
-                    success(newfaveList,200,res);  
-                } 
-            },(err) => next(err))
-            .catch((err) => next(err));
-        }
-        else {
-            // To do - loop through dishes in req.body
-            for (var _id in req.body) { 
-                if (req.body.hasOwnProperty(_id)) { 
-                    console.log(_id + " -> " + req.body[_id]); 
-                    if (!isDishInList(faveList,dish)) {
-                        console.log('Adding dish');
-                        faveList.dishes.push({_id : dish._id});
-                        faveList.save()
-                        .then((fave) => {
-                            success(fave,200,res);                
-                        }, (err) => next(err));
-                    }
-                    else {
-                        success(faveList,200,res);
-                    } 
-                } 
-            }
-            
-        }
-        
-        
-    })
-    .catch((err) => next(err));
-
-    
+    addDishToFaveList(req,res,next)
 })
 .put(cors.corsWithOptions, (req, res, next) => {
     res.statusCode = 403;
@@ -121,6 +67,9 @@ favoriteRouter.route('/:dishId')
     res.end('POST operation not supported on //'+ req.params.dishId);
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
+    //Get favourites for user
+    
+    
     Favorites.findByIdAndRemove(req.params.dishId)
     .then((resp) => {
         success(resp,200,res);
