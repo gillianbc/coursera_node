@@ -67,13 +67,26 @@ favoriteRouter.route('/:dishId')
     res.end('POST operation not supported on //'+ req.params.dishId);
 })
 .delete(cors.corsWithOptions, authenticate.verifyUser, (req, res, next) => {
-    //Get favourites for user
-    
-    
-    Favorites.findByIdAndRemove(req.params.dishId)
+    var dish;
+    //Get the dish from Mongo
+    Dishes.findById(req.params.dishId)
+    .then((fetchedDish) => {
+        if (fetchedDish == null) noDish(req,next);
+        dish = fetchedDish;  //hang on to the dish, we'll need it later
+        //return the result of fetching the user's favourites list
+        return Favorites.findOne({"user" : req.user._id});
+    })
+    .then((favelist) => {
+        if (favelist != null && isDishInList(favelist,dish)) {
+            favelist.dishes.remove(dish._id);
+            return favelist.save();
+        }
+        else
+            (err) => next(err)
+    })
     .then((resp) => {
         success(resp,200,res);
-    }, (err) => next(err))
+    })
     .catch((err) => next(err));
 });
 
